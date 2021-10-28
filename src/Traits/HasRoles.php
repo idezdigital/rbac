@@ -41,7 +41,7 @@ trait HasRoles
     public function hasPermission($permission)
     {
         return $this->roles->contains(function ($role) use ($permission) {
-            return in_array($permission, $role->permissions);
+            return $role->permissions->contains($permission);
         });
     }
 

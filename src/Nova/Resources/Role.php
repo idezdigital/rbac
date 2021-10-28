@@ -1,31 +1,42 @@
 <?php
 
-namespace Pktharindu\NovaPermissions\Nova;
+namespace iDezDigital\Rbac\Nova\Resources;
 
 use App\Nova\Resource;
+use App\Nova\User;
+use iDezDigital\Rbac\Models\Role as RoleModel;
 use Laravel\Nova\Fields\ID;
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\Slug;
 use Laravel\Nova\Fields\Text;
-use Benjaminhirsch\NovaSlugField\Slug;
 use Laravel\Nova\Fields\BelongsToMany;
-use Pktharindu\NovaPermissions\Checkboxes;
 use Benjaminhirsch\NovaSlugField\TextWithSlug;
-use Pktharindu\NovaPermissions\Role as RoleModel;
+use Silvanite\NovaFieldCheckboxes\Checkboxes;
 
 class Role extends Resource
 {
     public static $model = RoleModel::class;
 
+    public static function order()
+    {
+        return 1000;
+    }
+
     public static function group()
     {
-        return __(config('nova-permissions.role_resource_group', 'Other'));
+        return 'Administrativo';
+    }
+
+    public static function icon()
+    {
+        return icon('lock-closed')  ;
     }
 
     public static $title = 'name';
 
     public static $search = [
         'id',
-        'slug',
+        'key',
         'name',
     ];
 
@@ -33,50 +44,29 @@ class Role extends Resource
         'users',
     ];
 
-    public function actions(Request $request)
-    {
-        return [];
-    }
-
-    public function cards(Request $request)
-    {
-        return [];
-    }
-
     public function fields(Request $request)
     {
         return [
             ID::make()->sortable(),
 
-            TextWithSlug::make(__('Name'), 'name')
+            Text::make(__('Name'), 'name')
                 ->rules('required')
-                ->sortable()
-                ->slug('slug'),
+                ->sortable(),
 
-            Slug::make(__('Slug'), 'slug')
-                ->rules('required')
-                ->creationRules('unique:' . config('nova-permissions.table_names.roles', 'roles'))
-                ->updateRules('unique:' . config('nova-permissions.table_names.roles', 'roles') . ',slug,{{resourceId}}')
+            Slug::make('Slug', 'key')
+                ->from('name')
+                ->creationRules('unique:roles')
+                ->updateRules('unique:roles,key,{{resourceId}}')
                 ->sortable()
                 ->hideFromIndex(),
 
-            Checkboxes::make(__('Permissions'), 'permissions')
-                ->withGroups()
-                ->options(collect(config('nova-permissions.permissions'))->map(function ($permission, $key) {
-                    return [
-                        'group'        => __($permission['group']),
-                        'option'       => $key,
-                        'label'        => __($permission['display_name']),
-                        'description'  => __($permission['description']),
-                    ];
-                })->groupBy('group')->toArray()),
+            Checkboxes::make('Permissões', 'permissions')
+                ->options(config('rbac.permissions')),
 
-            Text::make(__('Users'), function () {
-                return \count($this->users);
-            })->onlyOnIndex(),
+            Text::make("Usuários", fn() => count($this->users))
+                ->onlyOnIndex(),
 
-            BelongsToMany::make(__('Users'), 'users', config('nova-permissions.user_resource', 'App\Nova\User'))
-                ->searchable(),
+            BelongsToMany::make('Usuários', 'users', User::class),
         ];
     }
 
@@ -87,16 +77,11 @@ class Role extends Resource
 
     public static function label()
     {
-        return __('Roles');
-    }
-
-    public function lenses(Request $request)
-    {
-        return [];
+        return "Permissões";
     }
 
     public static function singularLabel()
     {
-        return __('Role');
+        return "Grupo de Permissões";
     }
 }

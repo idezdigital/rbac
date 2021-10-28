@@ -1,15 +1,15 @@
 <?php
 
-namespace Pktharindu\NovaPermissions;
+namespace iDezDigital\Rbac\Nova\Tools;
 
+use iDezDigital\Rbac\Nova\Resources\Role;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
-use Pktharindu\NovaPermissions\Nova\Role;
 
-class NovaPermissions extends Tool
+
+class RbacTool extends Tool
 {
     protected $roleResource = Role::class;
-
     private $customRole = false;
 
     /**
@@ -17,13 +17,11 @@ class NovaPermissions extends Tool
      */
     public function boot()
     {
-        Nova::script('NovaPermissions', __DIR__.'/../dist/js/tool.js');
-        Nova::style('NovaPermissions', __DIR__.'/../dist/css/tool.css');
+        Nova::script('Rbac', __DIR__.'/../../../dist/js/tool.js');
+        Nova::style('Rbac', __DIR__.'/../../../dist/css/tool.css');
 
         if (! $this->customRole) {
-            Nova::resources([
-                $this->roleResource,
-            ]);
+            Nova::resources([$this->roleResource]);
         }
     }
 
@@ -32,10 +30,9 @@ class NovaPermissions extends Tool
      *
      * @return mixed
      */
-    public function roleResource(string $roleResource)
+    public function resource(string $roleResource)
     {
         $this->customRole = true;
-
         $this->roleResource = $roleResource;
 
         return $this;

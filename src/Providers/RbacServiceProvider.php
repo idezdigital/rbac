@@ -11,7 +11,7 @@ class RbacServiceProvider extends ServiceProvider
 
     private function setup()
     {
-        $this->publishes([__DIR__ . "/../../config/rbac.php" => config_path("rbac.php")]);
+        $this->publishes([__DIR__ . "/../../config/rbac.php" => config_path("rbac.php")], 'rbac');
         $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
     }
 

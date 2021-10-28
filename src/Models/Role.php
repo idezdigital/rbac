@@ -7,15 +7,13 @@ use iDezDigital\Rbac\Exceptions\UnknownPermissionException;
 use App\Traits\HasUUID;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
-use Pktharindu\NovaPermissions\Permission;
-use Pktharindu\NovaPermissions\Policies\Policy;
 
 class Role extends Model
 {
     use HasUUID;
 
     protected $fillable = [
-        'slug',
+        'key',
         'name',
         'permissions',
     ];
@@ -67,11 +65,11 @@ class Role extends Model
      */
     public function hasPermission($permission)
     {
-        return $this->getPermissions->contains('permission_slug', $permission);
+        return in_array($permission, $this->listPermissions());
     }
 
     public function listPermissions(){
-        return $this->permissions->pluck('key');
+        return $this->permissions->pluck('key')->toArray();
     }
 
     /**
@@ -91,9 +89,9 @@ class Role extends Model
             throw new UnknownPermissionException( "Unknown permission {$permission}");
         }
 
-        return Permission::create([
+        return $this->permissions()->create([
             'role_id'         => $this->id,
-            'permission_slug' => $permission,
+            'key' => $permission,
         ]);
     }
 
@@ -129,21 +127,12 @@ class Role extends Model
         return true;
     }
 
-    /**
-     * Get a list of permissions.
-     *
-     * @return array
-     */
+    /** Acessors & Mutators mostly for Nova */
     public function getPermissionsAttribute()
     {
-        return Permission::where('role_id', $this->id)->get('key')->pluck('key')->toArray();
+        return $this->permissions()->pluck('key');
     }
 
-    /**
-     * Replace all existing permissions with a new set of permissions.
-     *
-     * @param array $permissions
-     */
     public function setPermissionsAttribute(array $permissions)
     {
         if (! $this->id) {
@@ -153,10 +142,6 @@ class Role extends Model
         $this->revokeAll();
 
         collect($permissions)->map(function ($permission) {
-            if (! \in_array($permission, Policy::all(), true)) {
-                return;
-            }
-
             $this->grant($permission);
         });
     }
