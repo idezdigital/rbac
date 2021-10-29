@@ -34,7 +34,8 @@ class RbacServiceProvider extends ServiceProvider
     {
         $this->setup();
 
-        foreach (config('rbac.permissions') as $key => $permissions) {
+        $permissions = collect(config('rbac.permissions'))->mapWithKeys(fn($a) => $a);
+        foreach ($permissions as $key => $permission) {
             Gate::define($key, fn (User $user) => $user->hasPermission($key));
         }
     }

@@ -13,7 +13,9 @@ return [
     */
 
     'permissions' => [
-        'view-roles' => 'View Roles',
-        'create-roles' => 'Create Roles'
+        'Roles' => [
+            'view-roles' => 'View Roles',
+            'create-roles' => 'Create Roles'
+        ]
     ],
 ];

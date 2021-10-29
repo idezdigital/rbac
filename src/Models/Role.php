@@ -7,7 +7,8 @@ use iDezDigital\Rbac\Exceptions\UnknownPermissionException;
 use App\Traits\HasUUID;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 class Role extends Model
 {
     use HasUUID;
@@ -15,16 +16,29 @@ class Role extends Model
     protected $fillable = [
         'key',
         'name',
-        'permissions',
     ];
 
-    protected $appends = [
-        'permissions',
-    ];
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::updating(function ($role) {
+            $columns = collect($role)
+                ->filter(fn($value, $key) => Str::startsWith($key, 'permissions_'));
 
-    protected $casts = [
-        'permissions' => 'array',
-    ];
+            $columns->keys()->each(function($column) use ($role) {
+                unset($role->{$column});
+            });
+
+            $role->permissions = $columns->flatten();
+            return $role;
+        });
+
+        parent::booted();
+    }
 
     public function users()
     {
@@ -39,19 +53,17 @@ class Role extends Model
     /**
      * Replace all existing permissions with a new set of permissions.
      *
-     * @param array $permissions
+     * @param  array  $permissions
      */
-    public function setPermissions(array $permissions)
+    public function setPermissionsAttribute(Collection $permissions)
     {
-        if (! $this->id) {
+        if (!$this->id) {
             $this->save();
         }
 
         $this->revokeAll();
 
-        collect($permissions)->each(function ($permission) {
-            $this->grant($permission);
-        });
+        $permissions->each(fn ($permission) => $this->grant($permission));
 
         $this->setRelations([]);
     }
@@ -59,7 +71,7 @@ class Role extends Model
     /**
      * Check if a user has a given permission.
      *
-     * @param string $permission
+     * @param  string  $permission
      *
      * @return bool
      */
@@ -68,14 +80,15 @@ class Role extends Model
         return in_array($permission, $this->listPermissions());
     }
 
-    public function listPermissions(){
+    public function listPermissions()
+    {
         return $this->permissions->pluck('key')->toArray();
     }
 
     /**
      * Give Permission to a Role.
      *
-     * @param string $permission
+     * @param  string  $permission
      *
      * @return bool
      */
@@ -86,11 +99,11 @@ class Role extends Model
         }
 
         if (!array_key_exists($permission, Gate::abilities())) {
-            throw new UnknownPermissionException( "Unknown permission {$permission}");
+            throw new UnknownPermissionException("Unknown permission {$permission}");
         }
 
         return $this->permissions()->create([
-            'role_id'         => $this->id,
+            'role_id' => $this->id,
             'key' => $permission,
         ]);
     }
@@ -98,7 +111,7 @@ class Role extends Model
     /**
      * Revokes a Permission from a Role.
      *
-     * @param string $permission
+     * @param  string  $permission
      *
      * @return bool
      */
@@ -106,7 +119,6 @@ class Role extends Model
     {
         if (\is_string($permission)) {
             Permission::findOrFail($permission)->delete();
-
             $this->setRelations([]);
 
             return true;
@@ -133,16 +145,18 @@ class Role extends Model
         return $this->permissions()->pluck('key');
     }
 
-    public function setPermissionsAttribute(array $permissions)
+    /** Acessors & Mutators mostly for Nova */
+    public function getAttribute($key)
     {
-        if (! $this->id) {
-            $this->save();
+        if (strpos($key, 'permissions_') !== false) {
+            $slug = Str::after($key, 'permissions_');
+
+            $permissions = collect(config('rbac.permissions'))
+                ->mapWithKeys(fn($item, $key) => Str::slug($key) === $slug ? [Str::slug($key) => $item] : []);
+
+            return $this->getPermissionsAttribute()->intersect(array_keys($permissions[$slug]))->values();
         }
 
-        $this->revokeAll();
-
-        collect($permissions)->map(function ($permission) {
-            $this->grant($permission);
-        });
+        return parent::getAttribute($key);
     }
 }
