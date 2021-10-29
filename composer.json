@@ -18,12 +18,12 @@
     },
     "autoload": {
         "psr-4": {
-            "iDezDigital\\Rbac\\": "./src"
+            "iDez\\Rbac\\": "./src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "iDezDigital\\Rbac\\Tests\\": "tests"
+            "iDez\\Rbac\\Tests\\": "tests"
         }
     },
     "scripts": {
