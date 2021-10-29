@@ -1,5 +1,5 @@
 {
-    "name": "idezdigital/rbac",
+    "name": "idez/rbac",
     "description": "A description for rbac.",
     "type": "package",
     "license": "MIT",
@@ -32,7 +32,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "iDezDigital\\Rbac\\Providers\\RbacServiceProvider"
+                "iDez\\Rbac\\Providers\\RbacServiceProvider"
             ]
         }
     },

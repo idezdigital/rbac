@@ -1,6 +1,6 @@
 <?php
 
-namespace iDezDigital\Rbac\Models;
+namespace iDez\Rbac\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

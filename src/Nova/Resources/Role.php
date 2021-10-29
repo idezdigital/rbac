@@ -1,10 +1,10 @@
 <?php
 
-namespace iDezDigital\Rbac\Nova\Resources;
+namespace iDez\Rbac\Nova\Resources;
 
 use App\Nova\Resource;
 use App\Nova\User;
-use iDezDigital\Rbac\Models\Role as RoleModel;
+use iDez\Rbac\Models\Role as RoleModel;
 use Illuminate\Support\Str;
 use Laravel\Nova\Fields\ID;
 use Illuminate\Http\Request;

@@ -1,8 +1,8 @@
 <?php
 
-namespace iDezDigital\Rbac\Nova\Tools;
+namespace iDez\Rbac\Nova\Tools;
 
-use iDezDigital\Rbac\Nova\Resources\Role;
+use iDez\Rbac\Nova\Resources\Role;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
 

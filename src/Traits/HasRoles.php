@@ -1,9 +1,9 @@
 <?php
 
-namespace iDezDigital\Rbac\Traits;
+namespace iDez\Rbac\Traits;
 
 
-use iDezDigital\Rbac\Models\Role;
+use iDez\Rbac\Models\Role;
 
 trait HasRoles
 {

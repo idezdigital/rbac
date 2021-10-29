@@ -1,6 +1,6 @@
 <?php
 
-namespace iDezDigital\Rbac\Exceptions;
+namespace iDez\Rbac\Exceptions;
 
 use Exception;
 

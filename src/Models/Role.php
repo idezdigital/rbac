@@ -1,9 +1,9 @@
 <?php
 
-namespace iDezDigital\Rbac\Models;
+namespace iDez\Rbac\Models;
 
 use App\Models\User;
-use iDezDigital\Rbac\Exceptions\UnknownPermissionException;
+use iDez\Rbac\Exceptions\UnknownPermissionException;
 use App\Traits\HasUUID;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;

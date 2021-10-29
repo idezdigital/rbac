@@ -1,6 +1,6 @@
 <?php
 
-namespace iDezDigital\Rbac\Providers;
+namespace iDez\Rbac\Providers;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
