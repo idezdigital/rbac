@@ -26,19 +26,29 @@ class Role extends Model
     protected static function booted()
     {
         static::updating(function ($role) {
-            $columns = collect($role)
-                ->filter(fn($value, $key) => Str::startsWith($key, 'permissions_'));
+            $this->castPermissions($role);
+        });
 
-            $columns->keys()->each(function($column) use ($role) {
-                unset($role->{$column});
-            });
-
-            $role->permissions = $columns->flatten();
-            return $role;
+        static::creating(function($role){
+            $this->castPermissions($role);
         });
 
         parent::booted();
     }
+
+    private function castPermissions($role) 
+    {
+        $columns = collect($role)
+        ->filter(fn($value, $key) => Str::startsWith($key, 'permissions_'));
+
+        $columns->keys()->each(function($column) use ($role) {
+            unset($role->{$column});
+        });
+
+        $role->permissions = $columns->flatten();
+        return $role;
+    }
+
 
     public function users()
     {
