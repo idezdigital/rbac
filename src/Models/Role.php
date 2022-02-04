@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Closure;
+
 class Role extends Model
 {
     use HasUUID;
@@ -25,18 +27,14 @@ class Role extends Model
      */
     protected static function booted()
     {
-        static::updating(function ($role) {
-            $this->castPermissions($role);
-        });
+        static::updating(\Closure::fromCallable([static::class, 'castPermissions']));
 
-        static::creating(function($role){
-            $this->castPermissions($role);
-        });
+        static::creating(Closure::fromCallable([static::class, 'castPermissions']));
 
         parent::booted();
     }
 
-    private function castPermissions($role) 
+    private static function castPermissions($role)
     {
         $columns = collect($role)
         ->filter(fn($value, $key) => Str::startsWith($key, 'permissions_'));
