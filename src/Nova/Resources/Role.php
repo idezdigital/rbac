@@ -23,16 +23,6 @@ class Role extends Resource
         return 1000;
     }
 
-    public static function group()
-    {
-        return 'Administrativo';
-    }
-
-    public static function icon()
-    {
-        return icon('lock-closed')  ;
-    }
-
     public static $title = 'name';
 
     public static $search = [
