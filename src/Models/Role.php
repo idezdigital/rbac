@@ -13,7 +13,7 @@ use Closure;
 
 class Role extends Model
 {
-    use Illuminate\Database\Eloquent\Concerns\HasUuids;
+    use \Illuminate\Database\Eloquent\Concerns\HasUuids;
 
     protected $fillable = [
         'key',
