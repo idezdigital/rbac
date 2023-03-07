@@ -5,14 +5,12 @@ namespace iDez\Rbac\Nova\Resources;
 use App\Nova\Resource;
 use App\Nova\User;
 use iDez\Rbac\Models\Role as RoleModel;
-use Illuminate\Support\Str;
 use Laravel\Nova\Fields\ID;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Slug;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Panel;
-use Silvanite\NovaFieldCheckboxes\Checkboxes;
 
 class Role extends Resource
 {
@@ -51,32 +49,18 @@ class Role extends Resource
                 ->sortable()
                 ->hideFromIndex(),
 
-            Panel::make('Permissões', $this->permissionFields()),
+            Panel::make('Permissões', [
+                \Idez\NovaCheckboxesField\Checkboxes::make('', 'permissions')
+                    ->options(config('rbac.permissions'))
+                    ->withGroups()
+                    ->stacked(),
+            ]),
 
             Text::make("Usuários", fn() => count($this->users))
                 ->onlyOnIndex(),
 
             BelongsToMany::make('Usuários', 'users', User::class),
         ];
-    }
-
-    private function permissionFields()
-    {
-        $rbacPermissions = config('rbac.permissions');
-        foreach($rbacPermissions as $group => $permissions){
-            $slug = Str::slug($group);
-
-            $fields[] = Checkboxes::make($group, "permissions_{$slug}")
-                ->options($permissions)
-                ->columns(3)
-                ->hideFromIndex();
-        }
-
-//        $fields[] = Checkboxes::make('Permissões', 'permissions')
-//            ->options(collect($rbacPermissions)->mapWithKeys(fn($a) => $a)->toArray())
-//            ->onlyOnIndex();
-
-        return $fields;
     }
 
     public function filters(Request $request)

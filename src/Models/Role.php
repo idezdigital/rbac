@@ -37,7 +37,7 @@ class Role extends Model
     private static function castPermissions($role)
     {
         $columns = collect($role)
-        ->filter(fn($value, $key) => Str::startsWith($key, 'permissions_'));
+            ->filter(fn($value, $key) => Str::startsWith($key, 'permissions_'));
 
         $columns->keys()->each(function($column) use ($role) {
             unset($role->{$column});
@@ -63,7 +63,7 @@ class Role extends Model
      *
      * @param  array  $permissions
      */
-    public function setPermissionsAttribute(Collection $permissions)
+    public function setPermissionsAttribute($permissions)
     {
         if (!$this->id) {
             $this->save();
@@ -71,7 +71,8 @@ class Role extends Model
 
         $this->revokeAll();
 
-        $permissions->each(fn ($permission) => $this->grant($permission));
+        collect($permissions)
+            ->each(fn ($permission) => $this->grant($permission));
 
         $this->setRelations([]);
     }
