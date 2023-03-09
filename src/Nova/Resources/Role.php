@@ -25,7 +25,7 @@ class Role extends Resource
 
     public static $search = [
         'id',
-        'key',
+        'slug',
         'name',
     ];
 
@@ -42,10 +42,10 @@ class Role extends Resource
                 ->rules('required')
                 ->sortable(),
 
-            Slug::make('Slug', 'key')
+            Slug::make('Slug', 'slug')
                 ->from('name')
                 ->creationRules('unique:roles')
-                ->updateRules('unique:roles,key,{{resourceId}}')
+                ->updateRules('unique:roles,slug,{{resourceId}}')
                 ->sortable()
                 ->hideFromIndex(),
 
